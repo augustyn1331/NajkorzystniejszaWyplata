@@ -1,35 +1,23 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import palette from 'src/styles/palette';
+import { breakpoints, flexContainer, palette, fadeIn } from 'src/styles';
+import styled from 'styled-components';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    minHeight: '100vh',
-    padding: '0px 16px 32px 16px !important',
-    background: palette.white,
-    [theme.breakpoints.down('md')]: {
-      animation: 'fadein 0.2s ease-out',
-      WebkitAnimation: 'fadein 0.2s ease-out',
-    },
-    [theme.breakpoints.up('md')]: {
-      padding: '76px 16px 0px 16px !important',
-      flexDirection: 'row',
-    },
-  },
-  flexbox: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-}));
+const PageWrapper = styled(flexContainer)`
+  ${fadeIn}
+  min-height: 100vh;
+  padding: 0px 16px 32px 16px;
+  background: ${palette.white};
+  color: ${palette.black};
+  flex-direction: column;
+  @media only screen and (${breakpoints.md}) {
+    padding: 76px 16px 32px 16px;
+  }
+`;
 
 export default function Home() {
-  const classes = useStyles();
-
   return (
-    <div className={`${classes.root} ${classes.flexbox}`} id='Home'>
+    <PageWrapper id='Home'>
       <p>Hello world</p>
-    </div>
+    </PageWrapper>
   );
 }

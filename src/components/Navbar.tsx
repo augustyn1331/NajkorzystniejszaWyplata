@@ -1,12 +1,12 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Drawer } from '@material-ui/core';
-import { makeStyles, Theme } from '@material-ui/core/styles';
 import { useState } from 'react';
 import { Link as LinkScroll } from 'react-scroll';
 import logo from 'src/assets/logo.png';
 import useViewport from 'src/hooks/useViewport';
-import palette from 'src/styles/palette';
 import MenuIcon from '@material-ui/icons/Menu';
+import { breakpoints, fadeIn, flexStyles, palette } from 'src/styles';
+import styled from 'styled-components';
 
 const headersData = [
   {
@@ -15,124 +15,95 @@ const headersData = [
   },
 ];
 
-const useStyles = makeStyles<Theme>((theme: Theme) => ({
-  //Containers
-  toolbar: {
-    justifyContent: 'space-between',
-    minHeight: '54px',
-  },
-  appbar: {
-    [theme.breakpoints.down('md')]: {
-      animation: 'fadein 0.2s ease-out',
-      WebkitAnimation: 'fadein 0.2s ease-out',
-    },
-    background: palette.black,
-  },
-  drawer: {
-    background: 'linear-gradient(#f7f9fb,#fff,#fff,#fff,#fff)',
-  },
-  drawerWrapper: {
-    padding: '20px 30px',
-    listStyleType: 'none !important',
-    flexDirection: 'column',
-  },
-  //Logo img and logo link
-  navLogo: {
-    height: '30px',
-    [theme.breakpoints.up('md')]: {
-      height: '41px',
-    },
-  },
-  navLogoLink: {
-    marginLeft: '16px',
-    height: '54px',
-    cursor: 'pointer',
-    [theme.breakpoints.up('lg')]: {
-      marginLeft: '100px',
-    },
-  },
-  //Menu button
-  menuButton: {
-    padding: '0px 8px',
-    height: '54px',
-  },
-  menuIcon: {
-    height: 46,
-    width: 46,
-    fill: 'rgba(255,255,255,0.95)',
-  },
-  //Menu links
-  navUl: {
-    flexDirection: 'row',
-    marginTop: '0px',
-    listStyleType: 'none !important',
-    [theme.breakpoints.up('lg')]: {
-      marginRight: '64px',
-    },
-  },
-  navList: {
-    height: '76px',
-    margin: '0rem 1rem',
-  },
-  navLink: {
-    position: 'relative',
-    height: '100%',
-    fontSize: '1.7rem',
-    fontWeight: 300,
-    letterSpacing: '0.9px',
-    padding: '0px 2px',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    color: palette.black,
-    [theme.breakpoints.up('md')]: {
-      color: palette.white,
-    },
-    //underline shape
-    '&::before': {
-      content: "''",
-      position: 'absolute',
-      left: '0',
-      right: '0',
-      bottom: '0',
-      height: '3px',
-      transition: 'transform 200ms ease-out',
-      transform: 'scaleX(0)',
-      transformOrigin: '100% 50%',
-      backgroundColor: palette.primary,
-    },
-    //underline animation on active link
-    '&.active::before': {
-      transform: 'scaleX(1)',
-      transformOrigin: '0% 50%',
-    },
-  },
-  flexbox: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-}));
+const StyledAppBar = styled(AppBar)`
+  ${fadeIn}
+  background: ${palette.black} !important;
+`;
+const StyledToolBar = styled(Toolbar)`
+  justify-content: space-between;
+  min-height: 54px;
+`;
+const StyledUl = styled.ul`
+  ${flexStyles}
+  list-style-type: none;
+  flex-direction: column;
+`;
+const StyledUlMobile = styled(StyledUl)`
+  padding: 20px 30px;
+  flex-direction: column;
+`;
+const StyledUlDesktop = styled(StyledUl)`
+  @media only screen and (${breakpoints.lg}) {
+    margin-right: 64px;
+  }
+`;
+const StyledDrawer = styled(Drawer)`
+  & > .MuiPaper-root {
+    background-color: linear-gradient(#f7f9fb, #fff, #fff, #fff, #fff);
+  }
+`;
+const StyledLogo = styled.img`
+  height: 30px;
+  @media only screen and (${breakpoints.md}) {
+    height: 41px;
+  }
+`;
+const StyledLogoWrapper = styled(LinkScroll)`
+  ${flexStyles}
+  margin-left:16px;
+  height: 54px;
+  cursor: pointer;
+  @media only screen and (${breakpoints.md}) {
+    margin-left: 100px;
+  }
+`;
+const StyledMenuIcon = styled(MenuIcon)`
+  height: 46px;
+  width: 46px;
+  fill: rgba(255, 255, 255, 0.95);
+`;
+const StyledIconButton = styled(IconButton)`
+  height: 54px;
+  padding: 0px 8px;
+`;
 
+const StyledLi = styled.li`
+  height: 76px;
+  margin: 0rem 1rem;
+`;
+const StyledNavLink = styled(LinkScroll)`
+  ${flexStyles}
+  position: relative;
+  height: 100%;
+  font-size: 1.7rem;
+  font-weight: 300;
+  letter-spacing: 0.9px;
+  padding: 0px 2px;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${palette.black};
+  @media only screen and (${breakpoints.md}) {
+    color: ${palette.white};
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    transition: transform 200ms ease-out;
+    transform: scaleX(0);
+    transform-origin: 100% 50%;
+    background-color: ${palette.primary};
+  }
+  &.active::before {
+    transform: scaleX(1);
+    transform-origin: 0% 50%;
+  }
+`;
 const Navbar: React.FC = () => {
-  // styles (css in js)
-  const {
-    toolbar,
-    appbar,
-    drawer,
-    drawerWrapper,
-    navList,
-    navLogo,
-    navLogoLink,
-    navLink,
-    navUl,
-    menuIcon,
-    menuButton,
-    flexbox,
-  } = useStyles();
-
-  /* useState to control drawer being opened*/
   const [drawerOpen, setDrawerOpen] = useState(false);
-  /*Open and Close drawer */
   const handleDrawerState = () => setDrawerOpen((currState) => !currState);
   // Get current window width custom hook
   const width = useViewport();
@@ -141,32 +112,31 @@ const Navbar: React.FC = () => {
   /* Display desktop Navbar */
   const navbarDesktop = () => {
     return (
-      <Toolbar className={toolbar}>
+      <StyledToolBar>
         {myLogo()}
-        <ul className={`${navUl} ${flexbox}`}>{getDesktopLinks()}</ul>
-      </Toolbar>
+        <StyledUlDesktop>{getDesktopLinks()}</StyledUlDesktop>
+      </StyledToolBar>
     );
   };
 
   /* Display mobile Navbar */
   const navbarMobile = () => {
     return (
-      <Toolbar className={toolbar}>
+      <StyledToolBar>
         {myLogo()}
-        <IconButton className={menuButton} onClick={handleDrawerState}>
-          <MenuIcon className={menuIcon} />
-        </IconButton>
-        <Drawer
-          classes={{ paper: drawer }}
+        <StyledIconButton onClick={handleDrawerState}>
+          <StyledMenuIcon />
+        </StyledIconButton>
+        <StyledDrawer
           {...{
             anchor: 'left',
             open: drawerOpen,
             onClose: handleDrawerState,
           }}
         >
-          <ul className={`${drawerWrapper} ${flexbox}`}>{getMobileLinks()}</ul>
-        </Drawer>
-      </Toolbar>
+          <StyledUlMobile>{getMobileLinks()}</StyledUlMobile>
+        </StyledDrawer>
+      </StyledToolBar>
     );
   };
 
@@ -174,8 +144,8 @@ const Navbar: React.FC = () => {
   const getMobileLinks = () => {
     return headersData.map(({ label, href }) => {
       return (
-        <li key={label} className={navList}>
-          <LinkScroll
+        <StyledLi key={label}>
+          <StyledNavLink
             id={href + 'Link'}
             to={href}
             smooth={true}
@@ -183,12 +153,11 @@ const Navbar: React.FC = () => {
             spy={true}
             offset={-53} //different offset for mobile nav
             exact='true'
-            className={`${navLink} ${flexbox}`}
             onClick={handleDrawerState}
           >
             {label}
-          </LinkScroll>
-        </li>
+          </StyledNavLink>
+        </StyledLi>
       );
     });
   };
@@ -197,8 +166,8 @@ const Navbar: React.FC = () => {
   const getDesktopLinks = () => {
     return headersData.map(({ label, href }) => {
       return (
-        <li key={label} className={navList}>
-          <LinkScroll
+        <StyledLi key={label}>
+          <StyledNavLink
             id={href + 'Link'}
             to={href}
             smooth={true}
@@ -206,11 +175,10 @@ const Navbar: React.FC = () => {
             spy={true}
             offset={-76}
             exact='true'
-            className={`${navLink} ${flexbox}`}
           >
             {label}
-          </LinkScroll>
-        </li>
+          </StyledNavLink>
+        </StyledLi>
       );
     });
   };
@@ -218,25 +186,24 @@ const Navbar: React.FC = () => {
   //Logo button
   const myLogo = () => {
     return (
-      <LinkScroll
+      <StyledLogoWrapper
         to={'Home'}
         smooth={true}
         duration={500}
         spy={true}
         offset={-76}
         exact='true'
-        className={`${navLogoLink} ${flexbox}`}
       >
-        <img className={navLogo} src={logo} alt='car' />
-      </LinkScroll>
+        <StyledLogo src={logo} alt='car' />
+      </StyledLogoWrapper>
     );
   };
 
   return (
     <div data-aos='fade-down' data-aos-delay='100'>
-      <AppBar elevation={mobileView ? 1 : 0} className={appbar}>
+      <StyledAppBar elevation={mobileView ? 1 : 0}>
         {mobileView ? navbarMobile() : navbarDesktop()}
-      </AppBar>
+      </StyledAppBar>
     </div>
   );
 };
