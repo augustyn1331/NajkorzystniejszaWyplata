@@ -4,6 +4,8 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { create } from 'jss';
 import { createGenerateClassName, jssPreset } from '@material-ui/core/styles';
+import { Provider } from 'react-redux';
+import store from 'src/redux/store';
 
 createGenerateClassName();
 create({
@@ -16,7 +18,9 @@ create({
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
