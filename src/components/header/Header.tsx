@@ -30,7 +30,7 @@ const StyledAppBar = styled(AppBar)`
 const Header: React.FC = () => {
   return (
     <StyledAppBar elevation={0}>
-      <h1>Hello! Create new reminder</h1>
+      <h1>Najkorzystniejsza wypłata</h1>
     </StyledAppBar>
   );
 };
