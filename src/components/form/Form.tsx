@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useState } from 'react';
 import Button from 'src/components/common/Button';
 import { breakpoints, palette } from 'src/styles';
 import styled from 'styled-components';
@@ -13,9 +13,20 @@ import { Tags as RadioTags } from 'src/components/common/Tags';
 import { TextArea } from '../common/TextArea';
 import { useDispatch } from 'react-redux';
 import { addReminder } from 'src/redux/reminder/ReminderActions';
+import { Select } from '../common/Select';
+import { Popup } from '../common/Popup';
+import AddCategory from '../categories/AddCategory';
 
-const Form: React.FC = () => {
+interface Props {
+  categories: string[];
+}
+
+const Form: React.FC<Props> = ({ categories }) => {
   const dispatch = useDispatch();
+  const [visiblePopup, setVisiblePopup] = useState(false);
+  const togglePopup = () => {
+    setVisiblePopup((value) => !value);
+  };
   const validationSchema = Yup.object({
     name: Yup.string().required('Required'),
   });
@@ -24,7 +35,7 @@ const Form: React.FC = () => {
     today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
   const time = today.toLocaleTimeString().substring(0, 5);
   const initialValues = {
-    category: '',
+    category: 'Category 01',
     name: '',
     date,
     time,
@@ -45,9 +56,16 @@ const Form: React.FC = () => {
       validateOnBlur: false,
       onSubmit,
     });
-
+  console.log(values);
   return (
     <Container>
+      <Popup
+        title='Add Category'
+        visible={visiblePopup}
+        togglePopup={togglePopup}
+      >
+        <AddCategory togglePopup={togglePopup} />
+      </Popup>
       <form onSubmit={handleSubmit}>
         <Input
           label='Name'
@@ -67,15 +85,19 @@ const Form: React.FC = () => {
           onChange={handleChange('time')}
         />
         <CategoryContainer>
-          <Input label='Category' value='Category' />
-          <Button
-            variant='outlined'
+          <Select
+            label='Category'
+            options={categories}
+            value={values.category}
+            onChange={handleChange('category')}
+          />
+          <AddCategoryButton
+            variant={'outlined'}
+            colorVariant={'secondary'}
             label='Add New Category'
             startIcon={<StyledAddIcon />}
-            onClick={() => {
-              console.log('Added Category');
-            }}
-          />
+            onClick={togglePopup}
+          ></AddCategoryButton>
         </CategoryContainer>
         <RadioTags value={values.tags} onChange={handleChange('tags')} />
         <TextArea
@@ -83,7 +105,12 @@ const Form: React.FC = () => {
           value={values.description}
           onChange={handleChange('description')}
         />
-        <Button variant='contained' label='Save new reminder' type='submit' />
+        <SaveReminderButton
+          variant='contained'
+          label='Save new reminder'
+          type='submit'
+          colorVariant='primary'
+        />
       </form>
     </Container>
   );
@@ -100,9 +127,10 @@ const Container = styled.div`
   margin: 40px 0;
   width: 100%;
   @media only screen and (${breakpoints.md}) {
+    box-sizing: border-box;
     width: 635px;
     height: 482px;
-    padding: 0px 16px;
+    padding: 0px;
     margin-left: 16vw;
   }
 `;
@@ -117,4 +145,25 @@ const CategoryContainer = styled.div`
 const StyledAddIcon = styled(AddIcon)`
   font-size: 24px !important;
   margin-right: 4px;
+`;
+const AddCategoryButton = styled(Button)`
+  height: 30px;
+  width: 189px;
+  border: 1px solid ${palette.blue};
+  text-transform: capitalize !important;
+  @media only screen and (${breakpoints.md}) {
+    position: absolute !important;
+    right: 0;
+    height: 40px;
+  }
+`;
+const SaveReminderButton = styled(Button)`
+  height: 50px;
+  width: 210px;
+  font-weight: bold;
+  @media only screen and (${breakpoints.md}) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
 `;

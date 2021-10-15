@@ -1,50 +1,13 @@
 import React from 'react';
 import { ButtonProps, default as MuiButton } from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
-
-// I use Material UI's styling here - I would waste too much time on trying it to work with Styled Components
-
-const useStyles = makeStyles((theme) => ({
-  button: {
-    boxShadow: 'none',
-    flexDirection: 'row',
-    borderRadius: '30px !important',
-    fontSize: '14px',
-    lineHeight: '16px',
-    textAlign: 'center',
-    letterSpacing: '0.04rem',
-  },
-  contained: {
-    height: '50px',
-    width: '210px',
-    fontWeight: 'bold',
-    [theme.breakpoints.up('md')]: {
-      position: 'absolute',
-      left: '0',
-      bottom: '0',
-    },
-  },
-  outlined: {
-    height: '30px',
-    width: '189px',
-    border: '1px solid #0047FF',
-    textTransform: 'capitalize',
-    fontWeight: 500,
-    [theme.breakpoints.down('md')]: {
-      marginTop: '-6px',
-    },
-    [theme.breakpoints.up('md')]: {
-      height: '40px',
-      position: 'absolute',
-      right: 0,
-    },
-  },
-}));
+import styled from 'styled-components';
 
 interface Props extends ButtonProps {
   variant: 'contained' | 'outlined';
+  colorVariant: 'primary' | 'secondary';
   label: string;
   startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -52,36 +15,32 @@ const Button: React.FC<Props> = ({
   variant,
   label,
   startIcon,
+  endIcon,
   onClick,
+  colorVariant,
   ...props
 }) => {
-  const classes = useStyles();
-
-  if (variant === 'outlined') {
-    return (
-      <MuiButton
-        onClick={onClick}
-        startIcon={startIcon && startIcon}
-        variant={'outlined'}
-        color={'secondary'}
-        className={`${classes.outlined} ${classes.button}`}
-        {...props}
-      >
-        {label}
-      </MuiButton>
-    );
-  }
   return (
-    <MuiButton
+    <StyledButton
       onClick={onClick}
-      variant={'contained'}
-      color={'primary'}
+      startIcon={startIcon && startIcon}
+      endIcon={endIcon && endIcon}
+      variant={variant}
+      color={colorVariant}
       {...props}
-      className={`${classes.contained} ${classes.button}`}
     >
       {label}
-    </MuiButton>
+    </StyledButton>
   );
 };
 
 export default Button;
+
+const StyledButton = styled(MuiButton)`
+  box-shadow: none;
+  flex-direction: row;
+  border-radius: 30px !important;
+  line-height: 16px;
+  text-align: 'center';
+  letter-spacing: '0.04rem';
+`;

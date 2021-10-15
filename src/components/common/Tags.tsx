@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('md')]: {
       position: 'absolute',
       left: 0,
-      bottom: 15,
+      bottom: 13,
     },
   },
 }));

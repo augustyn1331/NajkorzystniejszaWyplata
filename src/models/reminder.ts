@@ -37,6 +37,7 @@ export interface ReminderJSON {
 }
 export interface ReminderState {
   reminders: Reminder[];
+  categories: string[];
   loading: boolean;
   error: string;
 }

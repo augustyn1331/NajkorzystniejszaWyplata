@@ -24,9 +24,29 @@ const theme = createMuiTheme(
           marginRight: '4px',
         },
       },
+      //overriding fontSize on the radio buttons
       MuiTypography: {
         body1: {
           fontSize: 14,
+        },
+      },
+      //add category popup
+      MuiDialog: {
+        paper: {
+          backgroundColor: 'rgba(0, 0, 0, .0) !important',
+          marginLeft: '6px',
+          marginRight: '8px',
+          boxShadow: 'none',
+        },
+      },
+      MuiDialogContent: {
+        root: {
+          padding: '0px',
+        },
+      },
+      MuiDialogActions: {
+        root: {
+          backgroundColor: 'white',
         },
       },
     },

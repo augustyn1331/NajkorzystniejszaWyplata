@@ -37,6 +37,25 @@ export const addReminder = createAsyncThunk<Reminder, ReminderForm>(
     return convertFormToReminder(newReminder);
   }
 );
+export const getCategories = createAsyncThunk<string[]>(
+  'reminder/getCategories',
+  async () => {
+    const response = await localStorage.getItem('categories');
+    if (!response) {
+      localStorage.setItem('categories', 'true');
+      return ['Category 01', 'Category 02', 'Category 03'];
+    }
+    if (response) {
+      return JSON.parse(response);
+    }
+  }
+);
+export const addCategory = createAsyncThunk<string, string>(
+  'reminder/addCategory',
+  async (category) => {
+    return category;
+  }
+);
 export const deleteReminder = createAsyncThunk<string, string>(
   'reminder/deleteReminder',
   async (id: string) => {

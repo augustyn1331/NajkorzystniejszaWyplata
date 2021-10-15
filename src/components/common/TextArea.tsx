@@ -1,5 +1,5 @@
 import React, { ChangeEvent, InputHTMLAttributes } from 'react';
-import { breakpoints } from 'src/styles';
+import { breakpoints, StyledPlaceholder } from 'src/styles';
 import styled from 'styled-components';
 
 interface Props extends InputHTMLAttributes<HTMLTextAreaElement> {
@@ -20,14 +20,10 @@ const StyledTextArea = styled.textarea`
   width: 100%;
   height: 87px;
   margin-bottom: 21px;
-  padding: 2px 8px;
+  padding: 4px 8px;
   border: 1px solid #cccccc;
   resize: none;
   font-size: 14px;
-  transition: all 0.2s ease-in;
-  &:hover {
-    transition: all 0.2s ease-in;
-  }
   @media only screen and (${breakpoints.md}) {
     width: 517px;
     height: 87px;
@@ -39,18 +35,4 @@ const StyledTextArea = styled.textarea`
 const Container = styled.div`
   position: relative;
   flex-direction: column;
-`;
-
-const StyledPlaceholder = styled.label`
-  font-size: 14px;
-  line-height: 18px;
-  align-self: flex-start;
-  margin: 0 0 4px 0;
-  @media only screen and (${breakpoints.md}) {
-    position: absolute;
-    bottom: 21px;
-    font-size: 14px;
-    line-height: 18px;
-    margin: 0;
-  }
 `;

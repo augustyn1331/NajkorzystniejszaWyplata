@@ -3,8 +3,11 @@ import { breakpoints, flexContainer, palette } from 'src/styles';
 import styled from 'styled-components';
 import Form from 'src/components/form/Form';
 import Reminders from 'src/components/reminder/Reminders';
-import { useDispatch, useSelector } from 'react-redux';
-import { getReminders } from 'src/redux/reminder/ReminderActions';
+import { useDispatch, useSelector, batch } from 'react-redux';
+import {
+  getReminders,
+  getCategories,
+} from 'src/redux/reminder/ReminderActions';
 import { reminderSelector } from 'src/redux/reminder/ReminderSlice';
 
 const PageWrapper = styled(flexContainer)`
@@ -20,14 +23,18 @@ const PageWrapper = styled(flexContainer)`
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { reminders } = useSelector(reminderSelector);
+  const { reminders, categories } = useSelector(reminderSelector);
   useEffect(() => {
-    dispatch(getReminders());
+    batch(() => {
+      dispatch(getReminders());
+      dispatch(getCategories());
+    });
   }, [dispatch]);
+
   //reverse() gives us default sorting from the newest reminders
   return (
     <PageWrapper id='Home'>
-      <Form />
+      <Form categories={categories} />
       <Reminders reminders={[...reminders].reverse()} />
     </PageWrapper>
   );
