@@ -9,28 +9,58 @@ import { useFormik } from 'formik';
 import { Input } from '../common/Input';
 
 export interface FlowersForm {
-  price: number;
-  secondDayPrice: number;
+  price: string;
+  secondDayPrice: string;
 }
 
 const Form: React.FC = () => {
-  const [state, setState] = useState(0);
+  const [state, setState] = useState<number[][]>([]);
+  const [maxInfo, setMaxInfo] = useState<string>('');
 
   const validationSchema = Yup.object({
     price: Yup.string().required('Required'),
   });
 
   const initialValues = {
-    price: 14,
-    secondDayPrice: 7,
+    price: '14',
+    secondDayPrice: '7',
   };
 
   const onSubmit = () => {
-    let matrix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let matrix = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
+
     const demand = [100, 200, 300, 400];
     const supply = [100, 200, 300, 400];
-    const buyPrices = [12, 10, 9];
-    
+    const buyPrices = [12, 10, 9, 9];
+    let maxElement = -999999999999999;
+
+    for (let i = 0; i < matrix.length; i++) {
+      let value = matrix[i];
+      for (let j = 0; j < matrix.length; j++) {
+        if (j > i) {
+          value[j] = value[i];
+          console.log('Szufladka[' + i + '][' + j + '] = ' + value[j]);
+        } else {
+          value[j] =
+            -supply[i] * buyPrices[i] +
+            (demand[j] * parseInt(values.price) +
+              (supply[i] - demand[j]) * parseInt(values.secondDayPrice));
+          console.log('Szufladka[' + i + '][' + j + '] = ' + value[j]);
+        }
+        console.log('current', value[j], 'max', maxElement);
+        if (value[j] > maxElement) {
+          maxElement = value[j];
+        }
+      }
+    }
+
+    setState(matrix);
+    setMaxInfo(maxElement.toString());
   };
 
   //TODO Error object values should be passed down and displayed in corresponding inputs
@@ -43,20 +73,19 @@ const Form: React.FC = () => {
       onSubmit,
     }
   );
-  console.log(values);
   return (
     <Container>
       <form onSubmit={handleSubmit}>
         <Input
           label='Cena 1 dnia'
           value={values.price}
-          onChange={handleChange('name')}
+          onChange={handleChange('price')}
           required
         />
         <Input
           label='Cena 2 dnia'
           value={values.secondDayPrice}
-          onChange={handleChange('date')}
+          onChange={handleChange('secondDayPrice')}
           required
         />
         <SaveReminderButton
@@ -67,8 +96,8 @@ const Form: React.FC = () => {
         />
       </form>
       <StyledDiv>
-        <p>Najkorzystniejsza wypłata nastąpi przy:</p>
-        <p>{!!state && state}</p>
+        <p>Największa wartość:</p>
+        <p>&nbsp;{!!maxInfo && maxInfo}</p>
       </StyledDiv>
     </Container>
   );
