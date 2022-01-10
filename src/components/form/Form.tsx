@@ -17,9 +17,10 @@ interface Results {
   score: matrix;
   loss?: matrix;
 }
+type CriteriumPosition = { x: number; y: number };
 
 const Form: React.FC = () => {
-  const [state, setState] = useState<Results>({ score: [], loss: [] });
+  const [state, setState] = useState<CriteriumPosition[]>([]);
 
   const validationSchema = Yup.object({
     price: Yup.string().required('Required'),
@@ -66,8 +67,7 @@ const Form: React.FC = () => {
         } else {
           value[j] =
             -supply[i] * buyPrices[i] +
-            (demand[j] * parseInt(values.price) +
-              (supply[i] - demand[j]) * parseInt(values.secondDayPrice));
+            (demand[j] * parseInt(values.price) + (supply[i] - demand[j]) * parseInt(values.secondDayPrice));
           // console.log('Szufladka[' + i + '][' + j + '] = ' + value[j]);
         }
       }
@@ -80,8 +80,7 @@ const Form: React.FC = () => {
     return score;
   };
 
-  const getTranspondedMatrix = (array: matrix) =>
-    array[0].map((x, i) => array.map((x) => x[i]));
+  const getTranspondedMatrix = (array: matrix) => array[0].map((x, i) => array.map((x) => x[i]));
 
   const AggColumn = (array: matrix, result: 'max' | 'min') => {
     let val: number[] = [];
@@ -94,19 +93,6 @@ const Form: React.FC = () => {
     return val;
   };
 
-  const getDecisions = (
-    score: matrix,
-    loss: matrix,
-    maxVal: number,
-    minVal: number
-  ) => {
-    return (
-      <div>
-        <h2>Kryterium Hurwicza: </h2>
-      </div>
-    );
-  };
-
   const getLoss = (loss: matrix, max: number[]): matrix => {
     for (let i = 0; i < loss.length; i++) {
       let value = loss[i];
@@ -114,72 +100,169 @@ const Form: React.FC = () => {
         value[j] = max[j] - value[j];
       }
     }
-    console.log(loss);
+    console.log(loss, 'loss');
     return loss;
     // setState({ score, loss });
   };
+  const sumFromRow = (array: number[][]) => {
+    let sum: number[] = [];
+    for (let i = 0; i < array.length; i++) {
+      let sumValue = 0;
+      for (let j = 0; j < array[i].length; j++) {
+        switch (j) {
+          case 0:
+            sumValue += array[i][j] * 0.2;
+            break;
+          case 1:
+            sumValue += array[i][j] * 0.1;
+            break;
+          case 2:
+            sumValue += array[i][j] * 0.5;
+            break;
+          case 3:
+            sumValue += array[i][j] * 0.2;
+            break;
+        }
+      }
+      sum = [...sum, sumValue];
+    }
+
+    return sum;
+  };
 
   //TODO Error object values should be passed down and displayed in corresponding inputs
-  const { handleChange, handleSubmit, values, errors } = useFormik<FlowersForm>(
-    {
-      initialValues,
-      validationSchema,
-      validateOnChange: false,
-      validateOnBlur: false,
-      onSubmit,
-    }
-  );
+  const { handleChange, handleSubmit, values, errors } = useFormik<FlowersForm>({
+    initialValues,
+    validationSchema,
+    validateOnChange: false,
+    validateOnBlur: false,
+    onSubmit,
+  });
+  const tabelaWyplat = getBestScore();
+  const maxScores = AggColumn(tabelaWyplat, 'max');
+  const minScores = AggColumn(tabelaWyplat, 'min');
+  const transpondedScores = getTranspondedMatrix(tabelaWyplat);
+  // console.log('funkcja max', AggColumn(transpondedScores, 'max'));
+  // console.log('funkcja min', AggColumn(transpondedScores, 'min'));
+  const stratyMozliwosci = getLoss(cloneArray(tabelaWyplat), maxScores);
+  const owdi = maxScores[0] * 0.2 + maxScores[1] * 0.1 + maxScores[2] * 0.5 + maxScores[3] * 0.2;
+
+  const getDecisions = (score: matrix, loss: matrix, maxVal: number[], minVal: number[]) => {
+    return (
+      <Decisions>
+        <div className='criterium'>
+          <h1>Kryterium Hurwicza: </h1>
+          <p className='value'>{Math.max(...maxVal)}</p>
+        </div>
+        <div className='criterium'>
+          <h1>Kryterium Walda: </h1>
+          <p className='value'>{Math.max(...minVal)}</p>
+        </div>
+        <div className='criterium'>
+          <h1>Kryterium Savage: </h1>
+          <p className='value'>{Math.min(...AggColumn(stratyMozliwosci, 'max'))}</p>
+        </div>
+        <div className='criterium'>
+          <h1>Kryterium OWI: </h1>
+          <p className='value'>{Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</p>
+        </div>
+        <div className='criterium'>
+          <h1>Kryterium OWDI: </h1>
+          <p className='value'>{owdi}</p>
+        </div>
+      </Decisions>
+    );
+  };
   return (
     <Container>
       <form onSubmit={handleSubmit}>
-        <Input
-          label='Cena 1 dnia'
-          value={values.price}
-          onChange={handleChange('price')}
-          required
-        />
-        <Input
-          label='Cena 2 dnia'
-          value={values.secondDayPrice}
-          onChange={handleChange('secondDayPrice')}
-          required
-        />
-        <SaveReminderButton
-          variant='contained'
-          label='Najlepsza wyplata'
-          type='submit'
-          colorVariant='primary'
-        />
-        {/* <SaveReminderButton
-          variant='outlined'
-          label='Straty możliwości'
-          type='submit'
-          colorVariant='primary'
-        /> */}
+        <Input label='Cena 1 dnia' value={values.price} onChange={handleChange('price')} required />
+        <Input label='Cena 2 dnia' value={values.secondDayPrice} onChange={handleChange('secondDayPrice')} required />
+        <SaveReminderButton variant='contained' label='Najlepsza wyplata' type='submit' colorVariant='primary' />
       </form>
       <StyledDiv>
-        <p>Najlepsza wypłata:</p>
-        {console.log(state.score)}
         {/* <p>&nbsp;{!!maxInfo && maxInfo}</p> */}
+        {!!values.price && !!values.secondDayPrice && (
+          <div className='tablesWrapper'>
+            <div className='tabela'>
+              <p>Tabela wypłat:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th> </th>
+                    <th>100</th>
+                    <th>200</th>
+                    <th>300</th>
+                    <th>400</th>
+                  </tr>
+                </thead>
+                {tabelaWyplat.map((row, i) => (
+                  <tr key={i}>
+                    <th scope='row'>{i + 1}00</th>
+                    {row.map((value, j) => (
+                      <td key={j}>{value}</td>
+                    ))}
+                  </tr>
+                ))}
+              </table>
+            </div>
+            <div className='tabela'>
+              <p>Tabela strat:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th> </th>
+                    <th>100</th>
+                    <th>200</th>
+                    <th>300</th>
+                    <th>400</th>
+                  </tr>
+                </thead>
+                {stratyMozliwosci.map((row, i) => (
+                  <tr key={i}>
+                    <th scope='row'>{i + 1}00</th>
+                    {row.map((value, j) => (
+                      <td key={j}>{value}</td>
+                    ))}
+                  </tr>
+                ))}
+              </table>
+            </div>
+            {getDecisions(tabelaWyplat, stratyMozliwosci, maxScores, minScores)}
+          </div>
+        )}
       </StyledDiv>
-      {/* {getDecisions()} */}
     </Container>
   );
 };
 
 export default Form;
 
+const Decisions = styled.div`
+  display: flex;
+  flex-direction: column;
+  .criterium {
+    margin: 20px 0;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    .value {
+      margin: 2px 20px 0 15px;
+      font-size: 26px;
+    }
+  }
+`;
+
 const Container = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  background: ${palette.white};
   padding: 0px 20px;
   margin: 40px 0;
-  width: 100%;
+  max-width: 100vw;
+
   @media only screen and (${breakpoints.md}) {
     box-sizing: border-box;
-    width: 635px;
     height: 482px;
     padding: 0px;
     margin-left: 16vw;
@@ -189,9 +272,63 @@ const Container = styled.div`
 const StyledDiv = styled.div`
   position: relative;
   display: flex;
-  flex-direction: row;
-  background: ${palette.white};
+  flex-direction: column;
   margin: 40px 0;
+  width: 100%;
+  .tablesWrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+  .tabela {
+    border: 1px solid black;
+    max-width: 500px;
+    margin: 20px 80px 0 0;
+    padding: 8px;
+    p {
+      font-size: 24px;
+      margin: 12px 24px 24px 0;
+    }
+
+    table {
+      align-self: center;
+      border-spacing: 0;
+      border: 1px solid black;
+      tr {
+        th {
+          background-color: ${palette.black};
+          color: ${palette.white};
+          border: 1px solid white;
+        }
+        :first-child {
+          th {
+            border-bottom: 1px solid black !important;
+          }
+        }
+        :last-child {
+          td,
+          th {
+            border-bottom: 0px;
+          }
+        }
+      }
+      th,
+      td {
+        margin: 0;
+        padding: 24px;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        text-align: center;
+        :first-child {
+          th {
+            border: 0;
+          }
+        }
+        :last-child {
+          border-right: 0;
+        }
+      }
+    }
+  }
 `;
 const SaveReminderButton = styled(Button)`
   height: 50px;
