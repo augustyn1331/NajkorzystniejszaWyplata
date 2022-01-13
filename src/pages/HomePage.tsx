@@ -15,7 +15,6 @@ const PageWrapper = styled(flexContainer)`
 `;
 
 const Home = () => {
-  //reverse() gives us default sorting from the newest reminders
   return (
     <PageWrapper id='Home'>
       <Form />

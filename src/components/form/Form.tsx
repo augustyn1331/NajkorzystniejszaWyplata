@@ -9,19 +9,13 @@ import { useFormik } from 'formik';
 import { Input } from '../common/Input';
 
 type matrix = number[][];
-export interface FlowersForm {
+type agg = { val: number[]; index: number[] };
+export interface Fields {
   price: string;
   secondDayPrice: string;
 }
-interface Results {
-  score: matrix;
-  loss?: matrix;
-}
-type CriteriumPosition = { x: number; y: number };
 
 const Form: React.FC = () => {
-  const [state, setState] = useState<CriteriumPosition[]>([]);
-
   const validationSchema = Yup.object({
     price: Yup.string().required('Required'),
   });
@@ -36,12 +30,12 @@ const Form: React.FC = () => {
   const buyPrices = [12, 10, 9, 9];
 
   const onSubmit = () => {
-    const bestScore = getBestScore();
-    const maxScores = AggColumn(bestScore, 'max');
-    const transpondedScores = getTranspondedMatrix(bestScore);
-    console.log('funkcja max', AggColumn(transpondedScores, 'max'));
-    console.log('funkcja min', AggColumn(transpondedScores, 'min'));
-    getLoss(cloneArray(bestScore), maxScores);
+    // const bestScore = getBestScore();
+    // const maxScores = AggColumn(bestScore, 'max');
+    // const transpondedScores = getTranspondedMatrix(bestScore);
+    // console.log('funkcja max', AggColumn(transpondedScores, 'max'));
+    // console.log('funkcja min', AggColumn(transpondedScores, 'min'));
+    // getLoss(cloneArray(bestScore), maxScores.val);
   };
 
   const cloneArray = (array: matrix): matrix => {
@@ -63,34 +57,27 @@ const Form: React.FC = () => {
       for (let j = 0; j < score.length; j++) {
         if (j > i) {
           value[j] = value[i];
-          // console.log('Szufladka[' + i + '][' + j + '] = ' + value[j]);
         } else {
           value[j] =
             -supply[i] * buyPrices[i] +
             (demand[j] * parseInt(values.price) + (supply[i] - demand[j]) * parseInt(values.secondDayPrice));
-          // console.log('Szufladka[' + i + '][' + j + '] = ' + value[j]);
         }
       }
     }
-    // console.log(score);
-    console.log(score);
-    // console.log('funkcja min', AggColumn(score, 'min'));
-    // console.log(minElInColumn);
-    // console.log(Math.max(...maxElInColumn));
     return score;
   };
 
   const getTranspondedMatrix = (array: matrix) => array[0].map((x, i) => array.map((x) => x[i]));
 
-  const AggColumn = (array: matrix, result: 'max' | 'min') => {
+  const AggColumn = (array: matrix, result: 'max' | 'min'): agg => {
     let val: number[] = [];
-    if (result === 'max') {
-      for (let i = 0; i < array.length; i++) val[i] = Math.max(...array[i]);
+    let index: number[] = [];
+
+    for (let i = 0; i < array.length; i++) {
+      val[i] = result === 'max' ? Math.max(...array[i]) : Math.min(...array[i]);
+      index[i] = array[i].indexOf(val[i]);
     }
-    if (result === 'min') {
-      for (let i = 0; i < array.length; i++) val[i] = Math.min(...array[i]);
-    }
-    return val;
+    return { val, index };
   };
 
   const getLoss = (loss: matrix, max: number[]): matrix => {
@@ -100,7 +87,6 @@ const Form: React.FC = () => {
         value[j] = max[j] - value[j];
       }
     }
-    console.log(loss, 'loss');
     return loss;
     // setState({ score, loss });
   };
@@ -131,7 +117,7 @@ const Form: React.FC = () => {
   };
 
   //TODO Error object values should be passed down and displayed in corresponding inputs
-  const { handleChange, handleSubmit, values, errors } = useFormik<FlowersForm>({
+  const { handleChange, handleSubmit, values, errors } = useFormik<Fields>({
     initialValues,
     validationSchema,
     validateOnChange: false,
@@ -140,35 +126,44 @@ const Form: React.FC = () => {
   });
   const tabelaWyplat = getBestScore();
   const maxScores = AggColumn(tabelaWyplat, 'max');
+  console.log(maxScores);
   const minScores = AggColumn(tabelaWyplat, 'min');
-  const transpondedScores = getTranspondedMatrix(tabelaWyplat);
-  // console.log('funkcja max', AggColumn(transpondedScores, 'max'));
-  // console.log('funkcja min', AggColumn(transpondedScores, 'min'));
-  const stratyMozliwosci = getLoss(cloneArray(tabelaWyplat), maxScores);
-  const owdi = maxScores[0] * 0.2 + maxScores[1] * 0.1 + maxScores[2] * 0.5 + maxScores[3] * 0.2;
+  const stratyMozliwosci = getLoss(cloneArray(tabelaWyplat), maxScores.val);
+  const owdi = maxScores.val[0] * 0.2 + maxScores.val[1] * 0.1 + maxScores.val[2] * 0.5 + maxScores.val[3] * 0.2;
 
-  const getDecisions = (score: matrix, loss: matrix, maxVal: number[], minVal: number[]) => {
+  const getDecisions = (max: agg, min: agg) => {
     return (
       <Decisions>
         <div className='criterium'>
-          <h1>Kryterium Hurwicza: </h1>
-          <p className='value'>{Math.max(...maxVal)}</p>
+          <h2>Kryterium Hurwicza: </h2>
+          <p className='value'>{Math.max(...max.val)}</p>
+          {/* {console.log(max.index)}
+          <p className='value'>{max.index}</p> */}
         </div>
         <div className='criterium'>
-          <h1>Kryterium Walda: </h1>
-          <p className='value'>{Math.max(...minVal)}</p>
+          <h2>Kryterium Walda: </h2>
+          <p className='value'>{Math.max(...min.val)}</p>
+          {/* <p className='value'>{max.index}</p> */}
         </div>
         <div className='criterium'>
-          <h1>Kryterium Savage: </h1>
-          <p className='value'>{Math.min(...AggColumn(stratyMozliwosci, 'max'))}</p>
+          <h2>Kryterium Savage: </h2>
+          <p className='value'>{Math.min(...AggColumn(stratyMozliwosci, 'max').val)}</p>
         </div>
         <div className='criterium'>
-          <h1>Kryterium OWI: </h1>
+          <h2>Kryterium OW: </h2>
           <p className='value'>{Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</p>
         </div>
         <div className='criterium'>
-          <h1>Kryterium OWDI: </h1>
+          <h2>Kryterium OWDI: </h2>
           <p className='value'>{owdi}</p>
+        </div>
+        <div className='criterium'>
+          <h2>Kryterium Oczekiwanej Straty Mozliwosci:</h2>
+          <p className='value'>{Math.min(...sumFromRow(cloneArray(stratyMozliwosci)))}</p>
+        </div>
+        <div className='criterium'>
+          <h2>Oczekiwana wartość doskonałej informacji: </h2>
+          <p className='value'>{owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</p>
         </div>
       </Decisions>
     );
@@ -178,7 +173,7 @@ const Form: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <Input label='Cena 1 dnia' value={values.price} onChange={handleChange('price')} required />
         <Input label='Cena 2 dnia' value={values.secondDayPrice} onChange={handleChange('secondDayPrice')} required />
-        <SaveReminderButton variant='contained' label='Najlepsza wyplata' type='submit' colorVariant='primary' />
+        {/* <FormButton variant='contained' label='Najlepsza wyplata' type='submit' colorVariant='primary' /> */}
       </form>
       <StyledDiv>
         {/* <p>&nbsp;{!!maxInfo && maxInfo}</p> */}
@@ -228,7 +223,7 @@ const Form: React.FC = () => {
                 ))}
               </table>
             </div>
-            {getDecisions(tabelaWyplat, stratyMozliwosci, maxScores, minScores)}
+            {getDecisions(maxScores, minScores)}
           </div>
         )}
       </StyledDiv>
@@ -281,7 +276,7 @@ const StyledDiv = styled.div`
   }
   .tabela {
     border: 1px solid black;
-    max-width: 500px;
+    max-height: 500px;
     margin: 20px 80px 0 0;
     padding: 8px;
     p {
@@ -330,7 +325,7 @@ const StyledDiv = styled.div`
     }
   }
 `;
-const SaveReminderButton = styled(Button)`
+const FormButton = styled(Button)`
   height: 50px;
   width: 210px;
   font-weight: bold;
