@@ -22,7 +22,7 @@ const StyledAppBar = styled(AppBar)`
     @media only screen and (${breakpoints.md}) {
       font-size: 48px;
       line-height: 62px;
-      margin-left: 16vw;
+      margin-left: 8vw;
     }
   }
 `;

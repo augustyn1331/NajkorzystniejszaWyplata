@@ -167,7 +167,7 @@ const Form: React.FC = () => {
       <Decisions>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium Hurwicza: {Hurwicz().value}</h2>
+            <h3>Kryterium Hurwicza: {Hurwicz().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Hurwicz().rowIndex}, {Hurwicz().columnIndex}]
@@ -175,7 +175,7 @@ const Form: React.FC = () => {
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium Walda: {Wald().value}</h2>
+            <h3>Kryterium Walda: {Wald().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Wald().rowIndex}, {Wald().columnIndex}]
@@ -183,7 +183,7 @@ const Form: React.FC = () => {
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium Savage: {Savage().value}</h2>
+            <h3>Kryterium Savage: {Savage().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Savage().rowIndex}, {Savage().columnIndex}]
@@ -191,24 +191,24 @@ const Form: React.FC = () => {
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium OW: {Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</h2>
+            <h3>Kryterium OW: {Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</h3>
           </div>
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium OWDI: {owdi}</h2>
+            <h3>Kryterium OWDI: {owdi}</h3>
           </div>
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>Kryterium Oczekiwanej Straty Mozliwosci: {Math.min(...sumFromRow(cloneArray(stratyMozliwosci)))}</h2>
+            <h3>Kryterium Oczekiwanej Straty Mozliwosci: {Math.min(...sumFromRow(cloneArray(stratyMozliwosci)))}</h3>
           </div>
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h2>
+            <h3>
               Oczekiwana wartość doskonałej informacji: {owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}
-            </h2>
+            </h3>
           </div>
         </div>
       </Decisions>
@@ -310,7 +310,7 @@ const Container = styled.div`
     box-sizing: border-box;
     height: 482px;
     padding: 0px;
-    margin-left: 16vw;
+    margin-left: 8vw;
   }
 `;
 
