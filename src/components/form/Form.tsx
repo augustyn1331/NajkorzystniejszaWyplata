@@ -16,10 +16,6 @@ export interface Fields {
 }
 
 const Form: React.FC = () => {
-  const validationSchema = Yup.object({
-    price: Yup.string().required('Required'),
-  });
-
   const initialValues = {
     price: '14',
     secondDayPrice: '7',
@@ -29,14 +25,7 @@ const Form: React.FC = () => {
   const supply = [100, 200, 300, 400];
   const buyPrices = [12, 10, 9, 9];
 
-  const onSubmit = () => {
-    // const bestScore = getBestScore();
-    // const maxScores = AggRow(bestScore, 'max');
-    // const transpondedScores = getTranspondedMatrix(bestScore);
-    // console.log('funkcja max', AggRow(transpondedScores, 'max'));
-    // console.log('funkcja min', AggRow(transpondedScores, 'min'));
-    // getLoss(cloneArray(bestScore), maxScores.val);
-  };
+  const onSubmit = () => {};
 
   const cloneArray = (array: matrix): matrix => {
     //clone 2d array, without this code it's always a reference
@@ -117,11 +106,8 @@ const Form: React.FC = () => {
   };
 
   //TODO Error object values should be passed down and displayed in corresponding inputs
-  const { handleChange, handleSubmit, values, errors } = useFormik<Fields>({
+  const { handleChange, handleSubmit, values } = useFormik<Fields>({
     initialValues,
-    validationSchema,
-    validateOnChange: false,
-    validateOnBlur: false,
     onSubmit,
   });
   const tabelaWyplat = getBestScore();
@@ -207,7 +193,7 @@ const Form: React.FC = () => {
         <div className='criterium'>
           <div className='value'>
             <h3>
-              Oczekiwana wartość doskonałej informacji: {owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}
+              Oczekiwana Wartość Doskonałej Informacji: {owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}
             </h3>
           </div>
         </div>
@@ -217,8 +203,18 @@ const Form: React.FC = () => {
   return (
     <Container>
       <form onSubmit={handleSubmit}>
-        <Input label='Cena 1 dnia' value={values.price} onChange={handleChange('price')} required />
-        <Input label='Cena 2 dnia' value={values.secondDayPrice} onChange={handleChange('secondDayPrice')} required />
+        <Input
+          label='Cena 1 Listopada - Wszystkich Świętych'
+          value={values.price}
+          onChange={handleChange('price')}
+          required
+        />
+        <Input
+          label='Cena 2 Listopada - Dzień Zaduszny'
+          value={values.secondDayPrice}
+          onChange={handleChange('secondDayPrice')}
+          required
+        />
         {/* <FormButton variant='contained' label='Najlepsza wyplata' type='submit' colorVariant='primary' /> */}
       </form>
       <StyledDiv>
@@ -322,12 +318,20 @@ const StyledDiv = styled.div`
   width: 100%;
   .tablesWrapper {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    @media screen and (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
   .tabela {
     border: 1px solid black;
     max-height: 500px;
-    margin: 20px 80px 0 0;
+    margin: 20px 0 0 0;
+    @media screen and (min-width: 768px) {
+      margin: 20px 80px 0 0;
+    }
+
     padding: 8px;
     p {
       font-size: 24px;

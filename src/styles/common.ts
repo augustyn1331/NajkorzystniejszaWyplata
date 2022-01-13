@@ -12,7 +12,6 @@ export const StyledPlaceholder = styled.label`
   align-self: flex-start;
   margin: 0 0 4px 0;
   @media only screen and (${breakpoints.md}) {
-    position: absolute;
     bottom: 22px;
     font-size: 14px;
     line-height: 18px;
@@ -28,7 +27,5 @@ export const StyledInputBase = css`
   border: 1px solid #cccccc;
   @media only screen and (${breakpoints.md}) {
     width: 304px;
-    margin-bottom: 20px;
-    margin-left: 110px;
   }
 `;
