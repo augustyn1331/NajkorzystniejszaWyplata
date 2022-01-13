@@ -31,10 +31,10 @@ const Form: React.FC = () => {
 
   const onSubmit = () => {
     // const bestScore = getBestScore();
-    // const maxScores = AggColumn(bestScore, 'max');
+    // const maxScores = AggRow(bestScore, 'max');
     // const transpondedScores = getTranspondedMatrix(bestScore);
-    // console.log('funkcja max', AggColumn(transpondedScores, 'max'));
-    // console.log('funkcja min', AggColumn(transpondedScores, 'min'));
+    // console.log('funkcja max', AggRow(transpondedScores, 'max'));
+    // console.log('funkcja min', AggRow(transpondedScores, 'min'));
     // getLoss(cloneArray(bestScore), maxScores.val);
   };
 
@@ -67,9 +67,9 @@ const Form: React.FC = () => {
     return score;
   };
 
-  const getTranspondedMatrix = (array: matrix) => array[0].map((x, i) => array.map((x) => x[i]));
+  // const getTranspondedMatrix = (array: matrix) => array[0].map((x, i) => array.map((x) => x[i]));
 
-  const AggColumn = (array: matrix, result: 'max' | 'min'): agg => {
+  const AggRow = (array: matrix, result: 'max' | 'min'): agg => {
     let val: number[] = [];
     let index: number[] = [];
 
@@ -125,45 +125,91 @@ const Form: React.FC = () => {
     onSubmit,
   });
   const tabelaWyplat = getBestScore();
-  const maxScores = AggColumn(tabelaWyplat, 'max');
-  console.log(maxScores);
-  const minScores = AggColumn(tabelaWyplat, 'min');
+  const maxScores = AggRow(tabelaWyplat, 'max');
+  const minScores = AggRow(tabelaWyplat, 'min');
   const stratyMozliwosci = getLoss(cloneArray(tabelaWyplat), maxScores.val);
   const owdi = maxScores.val[0] * 0.2 + maxScores.val[1] * 0.1 + maxScores.val[2] * 0.5 + maxScores.val[3] * 0.2;
 
-  const getDecisions = (max: agg, min: agg) => {
+  const Hurwicz = () => {
+    const value = Math.max(...maxScores.val);
+    const rowIndex = maxScores.val.indexOf(value);
+    const columnIndex = maxScores.index[rowIndex];
+    return {
+      value,
+      rowIndex,
+      columnIndex,
+    };
+  };
+  const Wald = () => {
+    const value = Math.max(...minScores.val);
+    const rowIndex = minScores.val.indexOf(value);
+    const columnIndex = minScores.index[rowIndex];
+    return {
+      value,
+      rowIndex,
+      columnIndex,
+    };
+  };
+  const Savage = () => {
+    const array = AggRow(stratyMozliwosci, 'max');
+    const value = Math.min(...array.val);
+    const rowIndex = array.val.indexOf(value);
+    const columnIndex = array.index[rowIndex];
+    return {
+      value,
+      rowIndex,
+      columnIndex,
+    };
+  };
+
+  const getDecisions = () => {
     return (
       <Decisions>
         <div className='criterium'>
-          <h2>Kryterium Hurwicza: </h2>
-          <p className='value'>{Math.max(...max.val)}</p>
-          {/* {console.log(max.index)}
-          <p className='value'>{max.index}</p> */}
+          <div className='value'>
+            <h2>Kryterium Hurwicza: {Hurwicz().value}</h2>
+          </div>
+          <p className='index'>
+            Pozycja w tabeli: [{Hurwicz().rowIndex}, {Hurwicz().columnIndex}]
+          </p>
         </div>
         <div className='criterium'>
-          <h2>Kryterium Walda: </h2>
-          <p className='value'>{Math.max(...min.val)}</p>
-          {/* <p className='value'>{max.index}</p> */}
+          <div className='value'>
+            <h2>Kryterium Walda: {Wald().value}</h2>
+          </div>
+          <p className='index'>
+            Pozycja w tabeli: [{Wald().rowIndex}, {Wald().columnIndex}]
+          </p>
         </div>
         <div className='criterium'>
-          <h2>Kryterium Savage: </h2>
-          <p className='value'>{Math.min(...AggColumn(stratyMozliwosci, 'max').val)}</p>
+          <div className='value'>
+            <h2>Kryterium Savage: {Savage().value}</h2>
+          </div>
+          <p className='index'>
+            Pozycja w tabeli: [{Savage().rowIndex}, {Savage().columnIndex}]
+          </p>
         </div>
         <div className='criterium'>
-          <h2>Kryterium OW: </h2>
-          <p className='value'>{Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</p>
+          <div className='value'>
+            <h2>Kryterium OW: {Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</h2>
+          </div>
         </div>
         <div className='criterium'>
-          <h2>Kryterium OWDI: </h2>
-          <p className='value'>{owdi}</p>
+          <div className='value'>
+            <h2>Kryterium OWDI: {owdi}</h2>
+          </div>
         </div>
         <div className='criterium'>
-          <h2>Kryterium Oczekiwanej Straty Mozliwosci:</h2>
-          <p className='value'>{Math.min(...sumFromRow(cloneArray(stratyMozliwosci)))}</p>
+          <div className='value'>
+            <h2>Kryterium Oczekiwanej Straty Mozliwosci: {Math.min(...sumFromRow(cloneArray(stratyMozliwosci)))}</h2>
+          </div>
         </div>
         <div className='criterium'>
-          <h2>Oczekiwana wartość doskonałej informacji: </h2>
-          <p className='value'>{owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}</p>
+          <div className='value'>
+            <h2>
+              Oczekiwana wartość doskonałej informacji: {owdi - Math.max(...sumFromRow(cloneArray(tabelaWyplat)))}
+            </h2>
+          </div>
         </div>
       </Decisions>
     );
@@ -223,7 +269,7 @@ const Form: React.FC = () => {
                 ))}
               </table>
             </div>
-            {getDecisions(maxScores, minScores)}
+            {getDecisions()}
           </div>
         )}
       </StyledDiv>
@@ -238,12 +284,16 @@ const Decisions = styled.div`
   flex-direction: column;
   .criterium {
     margin: 20px 0;
-    max-width: 500px;
     display: flex;
-    align-items: center;
-    .value {
+    flex-direction: column;
+    text-align: left;
+    .value,
+    .index {
       margin: 2px 20px 0 15px;
-      font-size: 26px;
+      font-size: 20px;
+    }
+    .value {
+      display: flex;
     }
   }
 `;
@@ -323,15 +373,5 @@ const StyledDiv = styled.div`
         }
       }
     }
-  }
-`;
-const FormButton = styled(Button)`
-  height: 50px;
-  width: 210px;
-  font-weight: bold;
-  @media only screen and (${breakpoints.md}) {
-    position: absolute;
-    left: 0;
-    bottom: 0;
   }
 `;
