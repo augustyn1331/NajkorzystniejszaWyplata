@@ -153,7 +153,7 @@ const Form: React.FC = () => {
       <Decisions>
         <div className='criterium'>
           <div className='value'>
-            <h3>Kryterium Hurwicza: {Hurwicz().value}</h3>
+            <h3 style={{ background: '#FFECB3' }}>Kryterium Hurwicza: {Hurwicz().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Hurwicz().rowIndex}, {Hurwicz().columnIndex}]
@@ -161,7 +161,7 @@ const Form: React.FC = () => {
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h3>Kryterium Walda: {Wald().value}</h3>
+            <h3 style={{ background: '#99FCFF' }}>Kryterium Walda: {Wald().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Wald().rowIndex}, {Wald().columnIndex}]
@@ -169,7 +169,7 @@ const Form: React.FC = () => {
         </div>
         <div className='criterium'>
           <div className='value'>
-            <h3>Kryterium Savage: {Savage().value}</h3>
+            <h3 style={{ background: '#FFDCFF' }}>Kryterium Savage: {Savage().value}</h3>
           </div>
           <p className='index'>
             Pozycja w tabeli: [{Savage().rowIndex}, {Savage().columnIndex}]
@@ -199,6 +199,18 @@ const Form: React.FC = () => {
         </div>
       </Decisions>
     );
+  };
+  const colorCheck = (i: number, j: number, table: 'loss' | 'gain') => {
+    if (i === Hurwicz().rowIndex && j === Hurwicz().columnIndex && table === 'gain') {
+      return '#FFECB3';
+    }
+    if (i === Wald().rowIndex && j === Wald().columnIndex && table === 'gain') {
+      return '#99FCFF';
+    }
+    if (i === Savage().rowIndex && j === Savage().columnIndex && table === 'loss') {
+      return '#FFDCFF';
+    }
+    return 'white';
   };
   return (
     <Container>
@@ -237,7 +249,9 @@ const Form: React.FC = () => {
                   <tr key={i}>
                     <th scope='row'>{i + 1}00</th>
                     {row.map((value, j) => (
-                      <td key={j}>{value}</td>
+                      <StyledCell key={j} cellColor={colorCheck(i, j, 'gain')}>
+                        {value}
+                      </StyledCell>
                     ))}
                   </tr>
                 ))}
@@ -259,7 +273,9 @@ const Form: React.FC = () => {
                   <tr key={i}>
                     <th scope='row'>{i + 1}00</th>
                     {row.map((value, j) => (
-                      <td key={j}>{value}</td>
+                      <StyledCell cellColor={colorCheck(i, j, 'loss')} key={j}>
+                        {value}
+                      </StyledCell>
                     ))}
                   </tr>
                 ))}
@@ -319,7 +335,7 @@ const StyledDiv = styled.div`
   .tablesWrapper {
     display: flex;
     flex-direction: column;
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 1024px) {
       flex-direction: row;
       justify-content: space-between;
     }
@@ -328,7 +344,7 @@ const StyledDiv = styled.div`
     border: 1px solid black;
     max-height: 500px;
     margin: 20px 0 0 0;
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 1024px) {
       margin: 20px 80px 0 0;
     }
 
@@ -363,7 +379,14 @@ const StyledDiv = styled.div`
       th,
       td {
         margin: 0;
-        padding: 24px;
+        padding: clamp(10px, 3.3vw, 14px);
+        @media screen and (min-width: 375px) {
+          padding: clamp(13px, 4vw, 24px);
+        }
+        @media screen and (min-width: 768px) {
+          padding: 24px;
+        }
+
         border-bottom: 1px solid black;
         border-right: 1px solid black;
         text-align: center;
@@ -378,4 +401,7 @@ const StyledDiv = styled.div`
       }
     }
   }
+`;
+const StyledCell = styled.td<{ cellColor: string }>`
+  background: ${({ cellColor }) => (cellColor ? cellColor : 'white')};
 `;

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppBar } from '@material-ui/core';
 import { palette, breakpoints } from 'src/styles';
 import styled from 'styled-components';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const StyledAppBar = styled(AppBar)`
   display: flex;
@@ -28,9 +30,19 @@ const StyledAppBar = styled(AppBar)`
 `;
 
 const Header: React.FC = () => {
+  useEffect(() => {
+    AOS.init({
+      once: true,
+      duration: 300,
+      disable: 'mobile',
+      easing: 'ease-out',
+    });
+  }, []);
   return (
     <StyledAppBar elevation={0}>
-      <h1>Ile zniczy zakupić?</h1>
+      <div data-aos='fade-right' data-aos-delay='400'>
+        <h1>Ile zniczy zakupić?</h1>
+      </div>
     </StyledAppBar>
   );
 };
